@@ -13,20 +13,20 @@ def load_batch(file_path):
 
 # === Part (a): Load all training data into Xtr ===
 def load_training_data(data_dir):
-    X_list = []
+    x_list = []
     for i in range(1, 6):  # There are 5 training batches
         file = os.path.join(data_dir, f"data_batch_{i}")
         data, _ = load_batch(file)
-        X_list.append(data)
-    Xtr = np.concatenate(X_list)  # Combine all batches
-    return Xtr
+        x_list.append(data)
+    xtr = np.concatenate(x_list)  # Combine all batches
+    return xtr
 
 # === Part (b): Load all test data into Y ===
 def load_test_labels(data_dir):
     file = os.path.join(data_dir, "test_batch")
     _, labels = load_batch(file)
-    Y = np.array(labels)
-    return Y
+    y = np.array(labels)
+    return y
 
 # === Part (c): Function to show a 32x32x3 image from a 3072 array ===
 def show_image(image_array):
