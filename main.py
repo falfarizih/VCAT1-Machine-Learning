@@ -1,37 +1,51 @@
 import pickle
-import os
 import numpy as np
 import matplotlib.pyplot as plt
+import os
 
-# [1.a] Load all training batches into variable Xtr
+# Helper function to load a batch file
 def load_batch(file_path):
     with open(file_path, 'rb') as f:
-        data = pickle.load(f, encoding='bytes')
-    X = data[b'data']  # Image data
-    Y = data[b'labels']  # Corresponding labels
-    return X, Y
+        batch = pickle.load(f, encoding='bytes')
+        data = batch[b'data']  # Image data
+        labels = batch[b'labels']  # Class labels
+    return data, labels
 
-def load_training_data(data_folder):
-    X_train = []
-    Y_train = []
-    for i in range(1, 6):  # There are 5 training batches (data_batch_1 to data_batch_5)
-        batch_file = os.path.join(data_folder, f'data_batch_{i}')
-        X_batch, Y_batch = load_batch(batch_file)
-        X_train.append(X_batch)
-        Y_train.extend(Y_batch)
-    X_train = np.vstack(X_train)  # Stack all batches vertically
-    Y_train = np.array(Y_train)
-    return X_train, Y_train  # Xtr, Ytr
+# === Part (a): Load all training data into Xtr ===
+def load_training_data(data_dir):
+    X_list = []
+    for i in range(1, 6):  # There are 5 training batches
+        file = os.path.join(data_dir, f"data_batch_{i}")
+        data, _ = load_batch(file)
+        X_list.append(data)
+    Xtr = np.concatenate(X_list)  # Combine all batches
+    return Xtr
 
-# [1.b] Load test batch into variable Y
-def load_test_data(data_folder):
-    X_test, Y_test = load_batch(os.path.join(data_folder, 'test_batch'))
-    return np.array(X_test), np.array(Y_test)
+# === Part (b): Load all test data into Y ===
+def load_test_labels(data_dir):
+    file = os.path.join(data_dir, "test_batch")
+    _, labels = load_batch(file)
+    Y = np.array(labels)
+    return Y
 
-# Example usage for loading data
-data_folder = 'cifar-10-batches-py'  # Change this if your path is different
-Xtr, Ytr = load_training_data(data_folder)  # Training data and labels
-X_test, Y_test = load_test_data(data_folder)  # Test data and labels
+# === Part (c): Function to show a 32x32x3 image from a 3072 array ===
+def show_image(image_array):
+    img = image_array.reshape(3, 32, 32).transpose(1, 2, 0)  # Reshape and rotate axes
+    plt.imshow(img)
+    plt.axis('off')
+    plt.show()
 
-print("Training data shape (Xtr):", Xtr.shape)
-print("Test data shape (X_test):", X_test.shape)
+# === Example Usage ===
+data_dir = 'cifar-10-batches-py'  # Path to the extracted folder
+
+# Part (a)
+Xtr = load_training_data(data_dir)
+print(f"Training data shape: {Xtr.shape}")  # Should be (50000, 3072)
+
+# Part (b)
+Y = load_test_labels(data_dir)
+print(f"Test labels shape: {Y.shape}")  # Should be (10000,)
+
+# Part (c)
+# Visualize the first image from the training set
+show_image(Xtr[75])
