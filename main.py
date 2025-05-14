@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import os
 from collections import Counter
 
-# === DATA LOADING (Preparation Phase) ===
+# Data Loading
 def load_batch(file_path):
     with open(file_path, 'rb') as f:
         batch = pickle.load(f, encoding='bytes')
@@ -12,7 +12,7 @@ def load_batch(file_path):
         labels = batch[b'labels']
     return data, labels
 
-# Part (a) - Load Training Data into Xtr
+# Load Training Data into Xtr
 def load_training_data(data_dir):
     x_list, y_list = [], []
     for i in range(1, 6):
@@ -24,7 +24,7 @@ def load_training_data(data_dir):
     Ytr = np.array(y_list)
     return Xtr, Ytr
 
-# Part (b) - Load Test Data into Y
+# Load Test Data into Y
 def load_test_data(data_dir):
     file = os.path.join(data_dir, "test_batch")
     data, labels = load_batch(file)
@@ -32,7 +32,7 @@ def load_test_data(data_dir):
     Yte = np.array(labels)
     return Xte, Yte
 
-# Part (c) - Visualize a Single Image
+# Visualize a Single Image
 def show_image(image_array, label):
     img = image_array.reshape(3, 32, 32).transpose(1, 2, 0)
     plt.imshow(img)
@@ -40,8 +40,7 @@ def show_image(image_array, label):
     plt.axis('off')
     plt.show()
 
-# === ALGORITHM ===
-# Part (a) - Compute K-Nearest-Neighbor with L1 Distance
+# Compute K-Nearest-Neighborwith chosen distance type
 def predict_knn(Xtr, Ytr, Xte, k=3, distance_type='l1'):
     predictions = []
     for i in range(len(Xte)):
@@ -50,7 +49,7 @@ def predict_knn(Xtr, Ytr, Xte, k=3, distance_type='l1'):
         elif distance_type == 'l2':
             distances = np.sqrt(np.sum((Xtr - Xte[i]) ** 2, axis=1))
         else:
-            raise ValueError("Invalid distance_type. Use 'l1' or 'l2'.")
+            raise ValueError("Invalid distance_type.")
 
         nearest_indices = np.argsort(distances)[:k]
         nearest_labels = Ytr[nearest_indices]
@@ -66,16 +65,17 @@ def predict_knn(Xtr, Ytr, Xte, k=3, distance_type='l1'):
         predictions.append(prediction)
     return np.array(predictions)
 
-# Part (b) - Visualize First 10 Test Images with Predicted Labels
+# VisualizeTest Images with Predicted Labels
 def visualize_predictions(Xte, predictions):
     for i in range(10):
         show_image(Xte[i], predictions[i])
-# Part (d): Calculate accuracy
+
+# Calculate accuracy
 def calculate_accuracy(predictions, yte):
     correct = np.sum(predictions == yte)
     return correct / len(yte)
 
-# Part (d): Plot accuracies for K values
+# Plot accuracies for K values
 def plot_accuracies(k_values, accuracies, distance_type):
     plt.plot(k_values, accuracies, marker='o')
     plt.xlabel('K Value')
@@ -84,11 +84,11 @@ def plot_accuracies(k_values, accuracies, distance_type):
     plt.grid(True)
     plt.show()
 
-# === MAIN EXECUTION ===
-data_dir = 'cifar-10-batches-py'  # Path to your extracted CIFAR-10 folder
+# main
+data_dir = 'cifar-10-batches-py'  # Path CIFAR-10 folder
 
 # Preparation Phase
-Xtr, Ytr = load_training_data(data_dir)  # Part (a)
+Xtr, Ytr = load_training_data(data_dir)
 print(f"\nTraining data shape (Xtr): {Xtr.shape}")  # Should be (50000, 3072)
 
 Xte, Yte = load_test_data(data_dir)  # Part (b)
@@ -99,12 +99,12 @@ predicted_labels = predict_knn(Xtr, Ytr, Xte[:10], k=7, distance_type='l1')
 
 print("\nPredicted Labels for First 10 Test Images:", predicted_labels)
 print("Actual Labels for First 10 Test Images:   ", Yte[:10])
-# Part (c) - Visualize the first training image
+# Visualize the first training image
 show_image(Xtr[0], Ytr[0])
 
 # Evaluation Phase
-test_subset = Xte[:50]
-test_labels = Yte[:50]
+test_subset = Xte[:1000]
+test_labels = Yte[:1000]
 
 k_values = [1, 3, 5, 7]
 distance_metrics = ['l1', 'l2']
@@ -123,8 +123,6 @@ for distance in distance_metrics:
     best_k = k_values[np.argmax(accuracies)]
     best_acc = max(accuracies) * 100
     print(f"Best K: {best_k} with Accuracy: {best_acc:.2f}%")
-
-
 
 
 visualize_predictions(Xte, predicted_labels)
