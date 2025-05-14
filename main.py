@@ -122,7 +122,7 @@ for distance in distance_metrics:
 
     best_k = k_values[np.argmax(accuracies)]
     best_acc = max(accuracies) * 100
-    print(f"[{distance.upper()}] Best K: {best_k} with Accuracy: {best_acc:.2f}%")
+    print(f"Best K: {best_k} with Accuracy: {best_acc:.2f}%")
 
 
 
