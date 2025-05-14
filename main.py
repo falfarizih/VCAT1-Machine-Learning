@@ -94,7 +94,7 @@ def visualize_predictions(Xte, predictions, Yte):
 
 
 # === MAIN EXECUTION ===
-data_dir = '/Users/khushirajput/Desktop/VCML/VCAT1-Machine-Learning/Data/cifar-10-batches-py'
+data_dir = 'cifar-10-batches-py'
 
 # Load data
 Xtr, Ytr = load_training_data(data_dir)
