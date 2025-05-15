@@ -13,6 +13,7 @@ def load_batch(file_path):
     return data, labels
 
 # Load Training Data into Xtr
+# Lädt alle Trainingsdaten in Xtr
 def load_training_data(data_dir):
     x_list, y_list = [], []
     for i in range(1, 6):
@@ -24,7 +25,8 @@ def load_training_data(data_dir):
     Ytr = np.array(y_list)
     return Xtr, Ytr
 
-# Load Test Data into Y
+# Load Test Data into Xte and Yte
+# Lädt die Testdaten in Xte und Yte
 def load_test_data(data_dir):
     file = os.path.join(data_dir, "test_batch")
     data, labels = load_batch(file)
@@ -33,6 +35,7 @@ def load_test_data(data_dir):
     return Xte, Yte
 
 # Visualize a Single Image
+# Visualisiert ein einzelnes Bild
 def show_image(image_array, label):
     img = image_array.reshape(3, 32, 32).transpose(1, 2, 0)
     plt.imshow(img)
@@ -41,6 +44,7 @@ def show_image(image_array, label):
     plt.show()
 
 # Compute K-Nearest-Neighborwith chosen distance type
+# Berechnet K-Nearest-Neighbor mit gewähltem Distanzmaß (L1 oder L2)
 def predict_knn(Xtr, Ytr, Xte, k=3, distance_type='l1'):
     predictions = []
     for i in range(len(Xte)):
@@ -51,12 +55,15 @@ def predict_knn(Xtr, Ytr, Xte, k=3, distance_type='l1'):
         else:
             raise ValueError("Invalid distance_type.")
 
+        # Finde die k nächsten Nachbarn
         nearest_indices = np.argsort(distances)[:k]
         nearest_labels = Ytr[nearest_indices]
 
+        # Bestimme das häufigste Label unter den Nachbarn
         label_counts = Counter(nearest_labels)
         most_common = label_counts.most_common()
 
+        # Wenn Gleichstand Nimm das Label des nächsten Nachbarn
         if len(most_common) > 1 and most_common[0][1] == most_common[1][1]:
             prediction = Ytr[nearest_indices[0]]  # Tie-breaker: nearest neighbor
         else:
@@ -65,17 +72,20 @@ def predict_knn(Xtr, Ytr, Xte, k=3, distance_type='l1'):
         predictions.append(prediction)
     return np.array(predictions)
 
-# VisualizeTest Images with Predicted Labels
+# Visualize the first 10 Test Images with Predicted Labels
+# Visualisiert die ersten 10 Testbilder mit den Vorhersagen
 def visualize_predictions(Xte, predictions):
     for i in range(10):
         show_image(Xte[i], predictions[i])
 
 # Calculate accuracy
+# Berechnet die Genauigkeit der Vorhersagen
 def calculate_accuracy(predictions, yte):
     correct = np.sum(predictions == yte)
     return correct / len(yte)
 
 # Plot accuracies for K values
+# Plottet die Genauigkeit für verschiedene K-Werte
 def plot_accuracies(k_values, accuracies, distance_type):
     plt.plot(k_values, accuracies, marker='o')
     plt.xlabel('K Value')
@@ -99,10 +109,13 @@ predicted_labels = predict_knn(Xtr, Ytr, Xte[:10], k=7, distance_type='l1')
 
 print("\nPredicted Labels for First 10 Test Images:", predicted_labels)
 print("Actual Labels for First 10 Test Images:   ", Yte[:10])
+
 # Visualize the first training image
+# Zeige das erste Trainingsbild als Beispiel
 show_image(Xtr[0], Ytr[0])
 
 # Evaluation Phase
+# Evaluierungsphase (Genauigkeit für verschiedene K und Distanzen)
 test_subset = Xte[:1000]
 test_labels = Yte[:1000]
 
@@ -118,11 +131,12 @@ for distance in distance_metrics:
         accuracies.append(acc)
         print(f"Accuracy for K={k}: {acc * 100:.2f}%")
 
+    # Zeige den Genauigkeits-Plot für L1 oder L2
     plot_accuracies(k_values, accuracies, distance)
 
     best_k = k_values[np.argmax(accuracies)]
     best_acc = max(accuracies) * 100
     print(f"Best K: {best_k} with Accuracy: {best_acc:.2f}%")
 
-
+# Visualisiere die Vorhersagen für die ersten 10 Testbilder
 visualize_predictions(Xte, predicted_labels)
